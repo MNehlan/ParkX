@@ -4,17 +4,27 @@ import { auth } from "../firebase/firebaseConfig"
 import { useNavigate } from "react-router-dom"
 import "../styles/auth.css"
 
+import { toast } from "react-toastify"
+
 function Signup() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [showPassword, setShowPassword] = useState(false)
   const navigate = useNavigate()
 
   const handleSignup = async (e) => {
     e.preventDefault()
 
-    await createUserWithEmailAndPassword(auth, email, password)
-
-    navigate("/dashboard")
+    try {
+      await createUserWithEmailAndPassword(auth, email, password)
+      navigate("/dashboard")
+    } catch (error) {
+      if (error.code === 'auth/email-already-in-use') {
+        toast.error("Email is already registered. Please log in.")
+      } else {
+        toast.error("Signup failed: " + error.message)
+      }
+    }
   }
 
   return (
@@ -29,17 +39,34 @@ function Signup() {
           required
         />
 
-        <input
-          className="auth-input"
-          type="password"
-          placeholder="Password"
-          onChange={e => setPassword(e.target.value)}
-          required
-        />
+        <div className="password-input-wrapper">
+          <input
+            className="auth-input"
+            type={showPassword ? "text" : "password"}
+            placeholder="Password"
+            onChange={e => setPassword(e.target.value)}
+            required
+          />
+          <button
+            type="button"
+            className="password-toggle"
+            onClick={() => setShowPassword(!showPassword)}
+          >
+            {showPassword ? "🙈" : "👁️"}
+          </button>
+        </div>
 
         <button className="auth-button">Create Account</button>
-        <p className="auth-link" onClick={() => navigate("/")}>
-          Already have an account? Log in
+        <p className="auth-switch">
+          Already have an account?{" "}
+          <span className="auth-link" onClick={() => navigate("/login")}>
+            Log in
+          </span>
+        </p>
+        <p className="auth-switch">
+          <span className="auth-link" onClick={() => navigate("/")}>
+            ← Back to Home
+          </span>
         </p>
       </form>
     </div>

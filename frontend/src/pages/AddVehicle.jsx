@@ -2,7 +2,9 @@ import { useEffect, useState } from "react"
 import { addDoc, collection, getDocs, onSnapshot, query, serverTimestamp, where } from "firebase/firestore"
 import { db } from "../firebase/firebaseConfig"
 import Navbar from "../components/Navbar"
+import SlotGrid from "../components/SlotGrid"
 import { useFacility } from "../context/useFacility"
+import { toast } from "react-toastify"
 
 function AddVehicle() {
   const { facility } = useFacility()
@@ -10,7 +12,9 @@ function AddVehicle() {
   const [vehicleNumber, setVehicleNumber] = useState("")
   const [vehicleType, setVehicleType] = useState("")
   const [driverName, setDriverName] = useState("")
-  const [occupied, setOccupied] = useState(0)
+  const [occupiedCount, setOccupiedCount] = useState(0)
+  const [bookedSlots, setBookedSlots] = useState([])
+  const [selectedSlot, setSelectedSlot] = useState(null)
 
   useEffect(() => {
     if (!facility) return
@@ -21,44 +25,62 @@ function AddVehicle() {
       where("status", "==", "IN")
     )
 
-    const unsub = onSnapshot(q, snap => setOccupied(snap.size))
+    const unsub = onSnapshot(q, snap => {
+      setOccupiedCount(snap.size)
+      // Extract slot numbers from documents
+      const slots = snap.docs
+        .map(doc => doc.data().slotNumber)
+        .filter(slot => slot !== undefined && slot !== null)
+      setBookedSlots(slots)
+    })
     return () => unsub()
   }, [facility])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
 
+    if (!selectedSlot) {
+      toast.error("Please select a parking slot!")
+      return
+    }
+
+    // Convert vehicle number to uppercase
+    const upperVehicleNumber = vehicleNumber.toUpperCase().trim()
+
     const duplicateCheck = query(
       collection(db, "vehicles"),
       where("facilityId", "==", facility.id),
-      where("vehicleNumber", "==", vehicleNumber),
+      where("vehicleNumber", "==", upperVehicleNumber),
       where("status", "==", "IN")
     )
 
     const dupSnap = await getDocs(duplicateCheck)
-    if (!dupSnap.empty) return alert("Vehicle already parked!")
+    if (!dupSnap.empty) {
+      toast.error("Vehicle already parked!")
+      return
+    }
 
     const entryTimestamp = new Date()
 
     await addDoc(collection(db, "vehicles"), {
       facilityId: facility.id,
-      vehicleNumber,
+      vehicleNumber: upperVehicleNumber,
       vehicleType,
       driverName,
+      slotNumber: selectedSlot, // Save the selected slot
       entryTime: serverTimestamp(),
       status: "IN",
     })
 
-    alert(
-      `Vehicle Added!\n` +
-      `Vehicle No: ${vehicleNumber}\n` +
-      `Driver: ${driverName}\n` +
-      `Entry Time: ${entryTimestamp.toLocaleString()}`
+    toast.success(
+      `Vehicle Added!\nSlot: ${selectedSlot}\nVehicle No: ${upperVehicleNumber}\nDriver: ${driverName}\nEntry Time: ${entryTimestamp.toLocaleString()}`,
+      { autoClose: 4000 }
     )
 
     setVehicleNumber("")
     setVehicleType("")
     setDriverName("")
+    setSelectedSlot(null)
   }
 
   if (!facility) return null
@@ -72,17 +94,29 @@ function AddVehicle() {
 
         {/* Display occupied slots info */}
         <div className="card occupied-info">
-          <p><strong>Current Occupied Slots:</strong> {occupied}</p>
-          <p><strong>Available Slots:</strong> {facility.totalSlots - occupied}</p>
+          <p><strong>Current Occupied Slots:</strong> {occupiedCount}</p>
+          <p><strong>Available Slots:</strong> {facility.totalSlots - occupiedCount}</p>
+        </div>
+
+        {/* Slot Grid Selection */}
+        <div className="section-container">
+          <h3>Select a Parking Slot</h3>
+          <SlotGrid
+            totalSlots={parseInt(facility.totalSlots)}
+            bookedSlots={bookedSlots}
+            onSlotSelect={setSelectedSlot}
+            selectedSlot={selectedSlot}
+          />
         </div>
 
         <form className="form" onSubmit={handleSubmit}>
           <div className="form-group">
             <input
               className="form-input"
-              placeholder="Vehicle Number"
+              placeholder="Vehicle Number (e.g., ABC1234)"
               value={vehicleNumber}
-              onChange={e => setVehicleNumber(e.target.value)}
+              onChange={e => setVehicleNumber(e.target.value.toUpperCase())}
+              style={{ textTransform: "uppercase" }}
               required
             />
           </div>
@@ -111,7 +145,15 @@ function AddVehicle() {
             />
           </div>
 
-          <button className="form-button">Add Vehicle</button>
+          {selectedSlot && (
+            <div className="selected-slot-info" style={{ marginBottom: '1rem', color: 'var(--primary-light)', fontWeight: 'bold' }}>
+              Selected Slot: {selectedSlot}
+            </div>
+          )}
+
+          <button className="form-button" disabled={!selectedSlot}>
+            {selectedSlot ? 'Add Vehicle' : 'Select a Slot'}
+          </button>
         </form>
       </div>
     </>

@@ -1,10 +1,10 @@
-import { useState } from "react"
+import { useState, useContext } from "react"
 import { addDoc, collection, serverTimestamp } from "firebase/firestore"
 import { db } from "../firebase/firebaseConfig"
-import { useAuth } from "../context/useAuth"
+import { AuthContext } from "../context/AuthContext"
 
 function FacilitySetupForm({ setFacility }) {
-  const { user } = useAuth()
+  const { user } = useContext(AuthContext)
 
   const [name, setName] = useState("")
   const [type, setType] = useState("")
@@ -42,7 +42,24 @@ function FacilitySetupForm({ setFacility }) {
       <form className="form" onSubmit={handleSubmit}>
         <input className="form-input" placeholder="Facility Name" onChange={e => setName(e.target.value)} required />
 
-        <input className="form-input" placeholder="Facility Type" onChange={e => setType(e.target.value)} required />
+        <select
+          className="form-select"
+          value={type}
+          onChange={e => setType(e.target.value)}
+          required
+        >
+          <option value="">Select Facility Type</option>
+          <option value="Shopping Mall">Shopping Mall</option>
+          <option value="Office Building">Office Building</option>
+          <option value="Residential Complex">Residential Complex</option>
+          <option value="Hospital">Hospital</option>
+          <option value="Airport">Airport</option>
+          <option value="Hotel">Hotel</option>
+          <option value="Restaurant">Restaurant</option>
+          <option value="Stadium">Stadium</option>
+          <option value="Public Parking">Public Parking</option>
+          <option value="Other">Other</option>
+        </select>
 
         <input className="form-input" type="number" placeholder="Total Slots" onChange={e => setSlots(e.target.value)} required />
 

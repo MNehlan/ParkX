@@ -41,7 +41,24 @@ function FacilityEditForm({ facility, setFacility, setEditing }) {
       <form className="form" onSubmit={handleUpdate}>
         <input className="form-input" value={name} onChange={e => setName(e.target.value)} />
 
-        <input className="form-input" value={type} onChange={e => setType(e.target.value)} />
+        <select 
+          className="form-select" 
+          value={type}
+          onChange={e => setType(e.target.value)} 
+          required
+        >
+          <option value="">Select Facility Type</option>
+          <option value="Shopping Mall">Shopping Mall</option>
+          <option value="Office Building">Office Building</option>
+          <option value="Residential Complex">Residential Complex</option>
+          <option value="Hospital">Hospital</option>
+          <option value="Airport">Airport</option>
+          <option value="Hotel">Hotel</option>
+          <option value="Restaurant">Restaurant</option>
+          <option value="Stadium">Stadium</option>
+          <option value="Public Parking">Public Parking</option>
+          <option value="Other">Other</option>
+        </select>
 
         <input className="form-input" type="number" value={slots} onChange={e => setSlots(e.target.value)} />
 

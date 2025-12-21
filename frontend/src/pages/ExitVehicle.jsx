@@ -3,6 +3,7 @@ import { collection, onSnapshot, query, where, updateDoc, doc, serverTimestamp }
 import { db } from "../firebase/firebaseConfig"
 import Navbar from "../components/Navbar"
 import { useFacility } from "../context/useFacility"
+import { toast } from "react-toastify"
 
 function ExitVehicle() {
   const { facility } = useFacility()
@@ -51,7 +52,7 @@ function ExitVehicle() {
       status: "OUT"
     })
 
-    alert(`Vehicle exited.\nFee: ₹${fee}`)
+    toast.success(`Vehicle exited successfully!\nFee: ₹${fee}`, { autoClose: 4000 })
   }
 
   if (!facility) return null

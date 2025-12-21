@@ -1,8 +1,10 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useContext } from "react"
 import { collection, getDocs, query, where } from "firebase/firestore"
 import { db } from "../firebase/firebaseConfig"
 import Navbar from "../components/Navbar"
-import { useAuth } from "../context/useAuth"
+import { AuthContext } from "../context/AuthContext"
+import { useAdmin } from "../context/useAdmin"
+import { Navigate } from "react-router-dom"
 
 // IMPORT SUB COMPONENTS
 import FacilitySetupForm from "../components/FacilitySetupForm"
@@ -10,7 +12,8 @@ import FacilityEditForm from "../components/FacilityEditForm"
 import FacilityAnalytics from "../components/FacilityAnalytics"
 
 function Dashboard() {
-  const { user } = useAuth()
+  const { user } = useContext(AuthContext)
+  const { isAdmin, loading: adminLoading } = useAdmin()
 
   const [facility, setFacility] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -39,6 +42,10 @@ function Dashboard() {
   }, [user])
 
   if (loading) return <p className="loading-text">Loading...</p>
+
+  if (!adminLoading && isAdmin) {
+    return <Navigate to="/admin" />
+  }
 
   return (
     <>

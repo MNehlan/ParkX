@@ -3,6 +3,7 @@ import { collection, onSnapshot, query, where } from "firebase/firestore"
 import { db } from "../firebase/firebaseConfig"
 import Navbar from "../components/Navbar"
 import { useFacility } from "../context/useFacility"
+import { toast } from "react-toastify"
 import "../styles/form.css"
 
 function History() {
@@ -83,7 +84,10 @@ function History() {
     : 0
 
   const downloadCSV = () => {
-    if (filtered.length === 0) return alert("No data to export")
+    if (filtered.length === 0) {
+      toast.warning("No data to export")
+      return
+    }
 
     const headers = ["Vehicle", "Type", "Duration", "Fee", "Entry Time", "Exit Time"]
     const rows = filtered.map(r => [
