@@ -41,10 +41,10 @@ function FacilityEditForm({ facility, setFacility, setEditing }) {
       <form className="form" onSubmit={handleUpdate}>
         <input className="form-input" value={name} onChange={e => setName(e.target.value)} />
 
-        <select 
-          className="form-select" 
+        <select
+          className="form-select"
           value={type}
-          onChange={e => setType(e.target.value)} 
+          onChange={e => setType(e.target.value)}
           required
         >
           <option value="">Select Facility Type</option>

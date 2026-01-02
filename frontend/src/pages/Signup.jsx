@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { createUserWithEmailAndPassword } from "firebase/auth"
-import { auth } from "../firebase/firebaseConfig"
+import { auth, db } from "../firebase/firebaseConfig"
+import { doc, setDoc, serverTimestamp } from "firebase/firestore"
 import { useNavigate } from "react-router-dom"
 import "../styles/auth.css"
 
@@ -16,7 +17,15 @@ function Signup() {
     e.preventDefault()
 
     try {
-      await createUserWithEmailAndPassword(auth, email, password)
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password)
+      const user = userCredential.user
+
+      await setDoc(doc(db, "users", user.uid), {
+        email: user.email,
+        createdAt: serverTimestamp(),
+        role: "user" // Default role
+      })
+
       navigate("/dashboard")
     } catch (error) {
       if (error.code === 'auth/email-already-in-use') {

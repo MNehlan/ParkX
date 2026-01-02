@@ -1,0 +1,57 @@
+/* Slot Grid Container */
+.slot-grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+    gap: 1rem;
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background: rgba(30, 41, 59, 0.5);
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+}
+
+/* Slot Button */
+.slot-btn {
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    border: none;
+    background: #10B981;
+    /* Default available (Green) */
+    color: white;
+    font-size: 1.5rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    transform: scale(1);
+}
+
+.slot-btn:hover:not(:disabled) {
+    opacity: 0.9;
+    transform: translateY(-2px);
+}
+
+/* Booked State */
+.slot-btn.booked {
+    background: #EF4444;
+    /* Red */
+    cursor: not-allowed;
+}
+
+/* Selected State */
+.slot-btn.selected {
+    background: #3B82F6;
+    /* Blue */
+    transform: scale(1.05);
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.5);
+    z-index: 10;
+}
+
+/* Read-only (no selection allowed) */
+.slot-btn.read-only {
+    cursor: default;
+}

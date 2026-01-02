@@ -61,9 +61,12 @@ function History() {
 
       case "custom":
         if (!customStart || !customEnd) return []
-        start = new Date(customStart)
-        end = new Date(customEnd)
-        end.setDate(end.getDate() + 1)
+        const [sYear, sMonth, sDay] = customStart.split('-').map(Number)
+        const [eYear, eMonth, eDay] = customEnd.split('-').map(Number)
+
+        start = new Date(sYear, sMonth - 1, sDay)
+        end = new Date(eYear, eMonth - 1, eDay)
+        end.setDate(end.getDate() + 1) // Include the end date fully
         break
 
       default:
@@ -89,9 +92,10 @@ function History() {
       return
     }
 
-    const headers = ["Vehicle", "Type", "Duration", "Fee", "Entry Time", "Exit Time"]
+    const headers = ["Vehicle", "Driver", "Type", "Duration", "Fee", "Entry Time", "Exit Time"]
     const rows = filtered.map(r => [
       r.vehicleNumber,
+      r.driverName || "Unknown",
       r.vehicleType,
       r.duration || "",
       r.fee || "",
@@ -154,6 +158,7 @@ function History() {
           <thead>
             <tr>
               <th>Vehicle</th>
+              <th>Driver</th>
               <th>Type</th>
               <th>Duration</th>
               <th>Fee</th>
@@ -165,6 +170,7 @@ function History() {
             {filtered.map(r => (
               <tr key={r.id}>
                 <td>{r.vehicleNumber}</td>
+                <td>{r.driverName || "-"}</td>
                 <td>{r.vehicleType}</td>
                 <td>{r.duration || "-"}</td>
                 <td>{r.fee ? `₹${r.fee}` : "-"}</td>

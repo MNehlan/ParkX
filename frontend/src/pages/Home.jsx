@@ -1,8 +1,50 @@
 import { useNavigate } from "react-router-dom"
+import { useEffect, useState } from "react"
+import { collection, getDocs } from "firebase/firestore"
+import { db } from "../firebase/firebaseConfig"
 import "../styles/home.css"
+import carInside from "../assets/carinsideimage.jpg"
+import insideParking from "../assets/inside.jpg"
+import emptyGarage from "../assets/emptygarage.jpg"
 
 function Home() {
   const navigate = useNavigate()
+  const [stats, setStats] = useState({
+    totalFacilities: 0,
+    totalSlots: 0,
+    typeBreakdown: {}
+  })
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, "facilities"))
+        let totalSlots = 0
+        const typeBreakdown = {}
+
+        querySnapshot.forEach((doc) => {
+          const data = doc.data()
+          totalSlots += Number(data.totalSlots || 0)
+
+          const type = data.type || "Other"
+          typeBreakdown[type] = (typeBreakdown[type] || 0) + 1
+        })
+
+        setStats({
+          totalFacilities: querySnapshot.size,
+          totalSlots,
+          typeBreakdown
+        })
+      } catch (error) {
+        console.error("Error fetching stats:", error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchStats()
+  }, [])
 
   return (
     <div className="home-container">
@@ -40,14 +82,12 @@ function Home() {
             </button>
           </div>
         </div>
-        <div className="hero-image">
-          <div className="parking-visual">
-            <div className="parking-lot">
-              {[...Array(12)].map((_, i) => (
-                <div key={i} className={`parking-slot ${i % 3 === 0 ? 'occupied' : ''}`}>
-                  <div className="slot-number">{i + 1}</div>
-                </div>
-              ))}
+        <div className="hero-image-container">
+          <div className="hero-image-grid">
+            <img src={carInside} alt="Modern Interior Parking" className="hero-img main" />
+            <div className="hero-img-col">
+              <img src={insideParking} alt="Indoor Parking Structure" className="hero-img sub" />
+              <img src={emptyGarage} alt="Clean Empty Garage" className="hero-img sub" />
             </div>
           </div>
         </div>
@@ -94,12 +134,12 @@ function Home() {
       <section className="stats-section">
         <div className="stats-container">
           <div className="stat-item">
-            <div className="stat-number">100+</div>
-            <div className="stat-label">Facilities</div>
+            <div className="stat-number">{loading ? "..." : stats.totalFacilities}</div>
+            <div className="stat-label">Facilities Managed</div>
           </div>
           <div className="stat-item">
-            <div className="stat-number">50K+</div>
-            <div className="stat-label">Vehicles Tracked</div>
+            <div className="stat-number">{loading ? "..." : stats.totalSlots.toLocaleString()}</div>
+            <div className="stat-label">Total Parking Slots</div>
           </div>
           <div className="stat-item">
             <div className="stat-number">99.9%</div>
@@ -110,6 +150,20 @@ function Home() {
             <div className="stat-label">Support</div>
           </div>
         </div>
+
+        {!loading && Object.keys(stats.typeBreakdown).length > 0 && (
+          <div className="type-stats-container">
+            <h3 className="type-stats-title">Trusted by Various Industries</h3>
+            <div className="type-grid">
+              {Object.entries(stats.typeBreakdown).map(([type, count]) => (
+                <div key={type} className="type-card">
+                  <div className="type-count">{count}</div>
+                  <div className="type-label">{type}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </section>
 
       {/* CTA Section */}

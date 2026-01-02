@@ -71,12 +71,16 @@ function AdminHistory() {
             case "all":
                 return records.filter(r => r.exitTime)
 
-            case "custom":
+            case "custom": {
                 if (!customStart || !customEnd) return []
-                start = new Date(customStart)
-                end = new Date(customEnd)
+                const [sYear, sMonth, sDay] = customStart.split('-').map(Number)
+                const [eYear, eMonth, eDay] = customEnd.split('-').map(Number)
+
+                start = new Date(sYear, sMonth - 1, sDay)
+                end = new Date(eYear, eMonth - 1, eDay)
                 end.setDate(end.getDate() + 1)
                 break
+            }
 
             default:
                 return []
@@ -98,10 +102,11 @@ function AdminHistory() {
             return
         }
 
-        const headers = ["Facility", "Vehicle", "Type", "Duration", "Fee", "Entry Time", "Exit Time"]
+        const headers = ["Facility", "Vehicle", "Driver", "Type", "Duration", "Fee", "Entry Time", "Exit Time"]
         const rows = filtered.map(r => [
             facilities[r.facilityId] || "Unknown",
             r.vehicleNumber,
+            r.driverName || "Unknown",
             r.vehicleType,
             r.duration || "",
             r.fee || "",
@@ -165,6 +170,7 @@ function AdminHistory() {
                         <tr>
                             <th>Facility</th>
                             <th>Vehicle</th>
+                            <th>Driver</th>
                             <th>Type</th>
                             <th>Duration</th>
                             <th>Fee</th>
@@ -177,6 +183,7 @@ function AdminHistory() {
                             <tr key={r.id}>
                                 <td>{facilities[r.facilityId] || "Unknown"}</td>
                                 <td>{r.vehicleNumber}</td>
+                                <td>{r.driverName || "-"}</td>
                                 <td>{r.vehicleType}</td>
                                 <td>{r.duration || "-"}</td>
                                 <td>{r.fee ? `₹${r.fee}` : "-"}</td>

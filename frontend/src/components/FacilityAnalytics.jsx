@@ -3,6 +3,7 @@ import { collection, onSnapshot, query, where } from "firebase/firestore"
 import { db } from "../firebase/firebaseConfig"
 import EntryTimeChart from "./EntryTimeChart"
 import SlotGrid from "./SlotGrid"
+import "../styles/analytics.css"
 
 function FacilityAnalytics({ facility, setEditing }) {
   const [occupied, setOccupied] = useState(0)
@@ -104,7 +105,7 @@ function FacilityAnalytics({ facility, setEditing }) {
 
 
       <div className="section-container" style={{ marginTop: '2rem' }}>
-        <h3 className="section-title">Live Parking Grid</h3>
+        <h3 className="section-title">Available Slots</h3>
         <SlotGrid
           totalSlots={parseInt(facility.totalSlots)}
           bookedSlots={bookedSlots}
@@ -127,8 +128,11 @@ function FacilityAnalytics({ facility, setEditing }) {
                     <span className="vehicle-icon">🚙</span>
                     <strong>{e.vehicleNumber}</strong>
                   </div>
-                  <div className="entry-time">
-                    {e.entryTime?.toDate ? e.entryTime.toDate().toLocaleString() : 'N/A'}
+                  <div className="entry-details">
+                    <span className="driver-name">{e.driverName || "Unknown Driver"}</span>
+                    <span className="entry-time-text">
+                      {e.entryTime?.toDate ? e.entryTime.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'N/A'}
+                    </span>
                   </div>
                 </div>
               </div>

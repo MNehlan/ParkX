@@ -130,6 +130,15 @@
   .auth-title {
     font-size: 1.5rem;
   }
+
+  .auth-form {
+    gap: 1rem;
+  }
+
+  .auth-input,
+  .auth-button {
+    font-size: 0.95rem;
+  }
 }
 
 /* Password Input Styles */

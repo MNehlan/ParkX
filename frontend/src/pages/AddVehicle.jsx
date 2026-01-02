@@ -62,18 +62,25 @@ function AddVehicle() {
 
     const entryTimestamp = new Date()
 
+    // Format Driver Name (Capitalize first letter of each word)
+    const formattedDriverName = driverName
+      .toLowerCase()
+      .split(' ')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ')
+
     await addDoc(collection(db, "vehicles"), {
       facilityId: facility.id,
       vehicleNumber: upperVehicleNumber,
       vehicleType,
-      driverName,
+      driverName: formattedDriverName,
       slotNumber: selectedSlot, // Save the selected slot
       entryTime: serverTimestamp(),
       status: "IN",
     })
 
     toast.success(
-      `Vehicle Added!\nSlot: ${selectedSlot}\nVehicle No: ${upperVehicleNumber}\nDriver: ${driverName}\nEntry Time: ${entryTimestamp.toLocaleString()}`,
+      `Vehicle Added!\nSlot: ${selectedSlot}\nVehicle No: ${upperVehicleNumber}\nDriver: ${formattedDriverName}\nEntry Time: ${entryTimestamp.toLocaleString()}`,
       { autoClose: 4000 }
     )
 

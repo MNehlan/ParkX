@@ -584,8 +584,22 @@
     grid-template-columns: 1fr;
   }
 
+  .admin-stats-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .stat-icon {
+    width: 60px;
+    height: 60px;
+    font-size: 2rem;
+  }
+
+  .stat-value {
+    font-size: 2rem;
+  }
+
   .vehicles-table-container {
     overflow-x: scroll;
   }
 }
-
