@@ -105,7 +105,7 @@ Rates are configured per facility by the owner during setup.
 
 ### 1. Clone the repository
 ```bash
-git clone https://github.com/your-username/ParkX.git
+git clone https://github.com/MNehlan/ParkX.git
 cd ParkX
 ```
 
